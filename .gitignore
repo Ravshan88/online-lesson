@@ -1,0 +1,11 @@
+# Backend uchun
+online-lesson-backend/__pycache__/
+online-lesson-backend/*.pyc
+online-lesson-backend/.env
+online-lesson-backend/.idea/
+
+# Frontend uchun
+online-lesson-frontend/node_modules/
+online-lesson-frontend/dist/
+online-lesson-frontend/.next/
+online-lesson-frontend/.nuxt/
