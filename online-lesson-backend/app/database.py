@@ -15,7 +15,6 @@ Base = declarative_base()
 
 def get_db():
     db = SessionLocal()
-    print("Postgres connected")
     try:
         yield db
     finally:

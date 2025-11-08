@@ -2,48 +2,70 @@ import React from "react";
 import { Form, Input, Button, Card, Col, Row, notification } from "antd";
 import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
-import { userApi } from "../api/userApi";
+import userApi from "../api/userApi";
 
-const LoginPage = () => {
+const RegisterPage = () => {
   const navigate = useNavigate();
-
-  const loginUser = useMutation({
-    mutationFn: userApi.login,
-    onSuccess: (data) => {
-      // Backend token qaytarishi kerak
-      localStorage.setItem("token", data.access_token);
+  // mutation
+  const registerUser = useMutation({
+    mutationFn: userApi.register,
+    onSuccess: () => {
       notification.success({
-        message: "Xush kelibsiz!",
-        description: "Siz tizimga muvaffaqiyatli kirdingiz."
+        message: "Muvaffaqiyatli!",
+        description: "Ro‘yxatdan o‘tish yakunlandi. Endi login qiling."
       });
-      navigate("/home");
+      navigate("/");
     },
     onError: (error) => {
       notification.error({
-        message: "Login xatosi!",
+        message: "Xatolik!",
         description:
-          error.response?.data?.detail || "Username yoki parol noto‘g‘ri"
+          error.response?.data?.detail || "Noma’lum xatolik yuz berdi"
       });
     }
   });
 
   const onFinish = (values) => {
-    loginUser.mutate(values);
+    registerUser.mutate(values);
   };
 
   return (
     <div
       style={{ display: "flex", justifyContent: "center", marginTop: "50px" }}
     >
-      <Card title='Login' style={{ width: 400 }}>
+      <Card title='Ro`yxatdan o`tish' style={{ width: 400 }}>
         <Form layout='vertical' onFinish={onFinish} autoComplete='off'>
           <Row style={{ width: "100%" }}>
+            <Col xs={24}>
+              <Form.Item
+                label='Ism'
+                name='firstname'
+                rules={[
+                  { required: true, message: "Itimos ismingizni kiriting!" }
+                ]}
+              >
+                <Input />
+              </Form.Item>
+            </Col>
+
+            <Col xs={24}>
+              <Form.Item
+                label='Familiya'
+                name='lastname'
+                rules={[
+                  { required: true, message: "Itimos familiyangizni kiriting!" }
+                ]}
+              >
+                <Input />
+              </Form.Item>
+            </Col>
+
             <Col xs={24}>
               <Form.Item
                 label='Username'
                 name='username'
                 rules={[
-                  { required: true, message: "Iltimos username kiriting!" }
+                  { required: true, message: "Itimos username kiriting!" }
                 ]}
               >
                 <Input />
@@ -55,7 +77,7 @@ const LoginPage = () => {
                 label='Parol'
                 name='password'
                 rules={[
-                  { required: true, message: "Iltimos parolingizni kiriting!" }
+                  { required: true, message: "Itimos parolingizni kiriting!" }
                 ]}
               >
                 <Input.Password />
@@ -68,17 +90,11 @@ const LoginPage = () => {
                   type='primary'
                   htmlType='submit'
                   block
-                  loading={loginUser.isLoading}
+                  loading={registerUser.isPending}
                 >
-                  Kirish
+                  Ro`yxatdan o`tish
                 </Button>
               </Form.Item>
-            </Col>
-
-            <Col xs={24}>
-              <Button onClick={() => navigate("/register")} type='link'>
-                Ro`yxatdan o`tish
-              </Button>
             </Col>
           </Row>
         </Form>
@@ -87,4 +103,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default RegisterPage;

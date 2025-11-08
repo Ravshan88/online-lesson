@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from . import models
-from .database import engine
-from .routers import user, auth
+from .database import engine, get_db
+from .routers import user, auth, sections, materials, test
 
 models.Base.metadata.create_all(bind=engine)
 app = FastAPI()
@@ -13,9 +13,7 @@ def root():
     return {"Hello": "World"}
 
 
-origins = [
-    '*'
-]
+origins = ["*"]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -26,3 +24,29 @@ app.add_middleware(
 
 app.include_router(user.router)
 app.include_router(auth.router)
+app.include_router(sections.router)
+app.include_router(materials.router)
+app.include_router(test.router)
+
+
+# Seed default sections on startup if empty
+@app.on_event("startup")
+def seed_sections():
+    from .models import Section
+    from .database import SessionLocal
+
+    db = SessionLocal()
+    try:
+        count = db.query(Section).count()
+        if count == 0:
+            defaults = [
+                {"name": "Maruza"},
+                {"name": "Amaliy"},
+                {"name": "Tajriba"},
+                {"name": "Mustaqil Ish"}
+            ]
+            for data in defaults:
+                db.add(Section(**data))
+            db.commit()
+    finally:
+        db.close()

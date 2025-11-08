@@ -1,8 +1,6 @@
-from datetime import datetime
-from filecmp import dircmp
-from typing import Optional
+from typing import Optional, List
 
-from pydantic import BaseModel, EmailStr, validator, conint
+from pydantic import BaseModel
 
 
 class UserCreate(BaseModel):
@@ -15,6 +13,8 @@ class UserCreate(BaseModel):
 class UserOut(BaseModel):
     id: int
     username: str
+    firstname: str
+    lastname: str
 
     class Config:
         from_attributes = True
@@ -23,34 +23,6 @@ class UserOut(BaseModel):
 class UserLogin(BaseModel):
     username: str
     password: str
-
-
-class PostBase(BaseModel):
-    title: str
-    content: str
-    published: bool = False
-
-
-class PostCreate(PostBase):
-    pass
-
-
-class Post(PostBase):
-    id: int
-    created_at: datetime
-    user_id: int
-    user: UserOut
-
-    class Config:
-        from_attributes = True
-
-
-class PostOut(BaseModel):
-    Post: Post
-    votes: int
-
-    class Config:
-        from_attributes = True
 
 
 class Token(BaseModel):
@@ -62,6 +34,59 @@ class TokenData(BaseModel):
     id: Optional[int] = None
 
 
-class Vote(BaseModel):
-    post_id: int
-    dir: conint(le=1)
+# Section schemas
+# =========================
+# Test schemas
+# =========================
+class TestBase(BaseModel):
+    material_id: int
+    question: str
+    options: List[str]
+    correct_answer: str
+
+
+class TestCreate(TestBase):
+    pass
+
+
+class Test(TestBase):
+    id: int
+
+    class Config:
+        from_attributes = True
+
+
+# =========================
+# Material schemas
+# =========================
+class MaterialBase(BaseModel):
+    title: Optional[str]
+    pdf_path: Optional[str] = None
+    video_type: Optional[str] = None  # "youtube" or "file"
+    video_url: Optional[str] = None
+
+
+class MaterialCreate(MaterialBase):
+    section_id: int
+    tests: List[TestCreate] = []  # material yaratilganda testlar ham kiritilishi mumkin
+
+
+class Material(MaterialBase):
+    id: int
+    section_id: int
+    tests: List[Test] = []  # bog‘langan testlar chiqadi
+
+    class Config:
+        orm_mode = True
+
+
+class SectionBase(BaseModel):
+    name: str
+
+
+class Section(SectionBase):
+    id: int
+    materials: int
+
+    class Config:
+        from_attributes = True
