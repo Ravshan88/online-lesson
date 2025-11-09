@@ -250,7 +250,7 @@ export default function MaterialsTable({ sectionId }) {
     <div style={{ padding: 16 }}>
       <Space style={{ marginBottom: 12 }}>
         <Button type='primary' icon={<PlusOutlined />} onClick={openAddModal}>
-          Add Material
+          Material qo`shish
         </Button>
       </Space>
 
@@ -263,7 +263,7 @@ export default function MaterialsTable({ sectionId }) {
       />
 
       <Modal
-        title={editing ? "Edit Material" : "Add Material"}
+        title={editing ? "Materialni tahrirlash" : "Material qo`shish"}
         open={isModalOpen}
         onCancel={() => setIsModalOpen(false)}
         footer={null}
@@ -272,7 +272,7 @@ export default function MaterialsTable({ sectionId }) {
         <Form layout='vertical' form={form} onFinish={onFinish}>
           <Form.Item
             name='title'
-            label='Title'
+            label='Material nomi'
             rules={[{ required: true, message: "Material nomini kiriting" }]}
           >
             <Input placeholder='Material nomi' />

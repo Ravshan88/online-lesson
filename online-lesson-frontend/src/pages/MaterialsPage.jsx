@@ -2,7 +2,19 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useQuery, useQueries } from "@tanstack/react-query";
 import { getMaterialsBySection } from "../api/materialsApi";
 import { getMaterialProgress } from "../api/progressApi";
-import { Card, Row, Col, Typography, Spin, Tag, Empty, Progress } from "antd";
+import {
+  Card,
+  Row,
+  Col,
+  Typography,
+  Spin,
+  Tag,
+  Empty,
+  Progress,
+  Breadcrumb,
+  Button
+} from "antd";
+import { HomeOutlined, ArrowLeftOutlined } from "@ant-design/icons";
 import AppHeader from "../components/AppHeader";
 
 const { Title, Paragraph } = Typography;
@@ -47,10 +59,34 @@ export default function MaterialsPage() {
     navigate(`material/${material_id}`);
   };
 
+  const handleBack = () => {
+    navigate("/home");
+  };
+
   return (
     <div>
       <AppHeader />
       <div className='p-6'>
+        <Breadcrumb
+          style={{ marginBottom: 16 }}
+          items={[
+            {
+              title: (
+                <a href='/home'>
+                  <HomeOutlined /> Bosh sahifa
+                </a>
+              )
+            },
+            {
+              title: section
+            }
+          ]}
+        />
+        <div style={{ marginBottom: 16 }}>
+          <Button icon={<ArrowLeftOutlined />} onClick={handleBack}>
+            Orqaga
+          </Button>
+        </div>
         <Title className=' flex justify-center'>{section}</Title>
         <Row className='p-6' gutter={[16, 16]}>
           {materials.map((m, i) => {

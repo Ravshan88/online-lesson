@@ -1,5 +1,5 @@
-import React from "react";
-import { Layout, Avatar, Dropdown, Menu, Space, Typography } from "antd";
+import React, { useEffect } from "react";
+import { Layout, Avatar, Dropdown, Menu, Space, Typography, Spin } from "antd";
 import {
   UserOutlined,
   HomeOutlined,
@@ -7,21 +7,28 @@ import {
   DownOutlined
 } from "@ant-design/icons";
 import { Link, useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { userApi } from "../api/userApi";
 import logo from "../assets/oxu.png";
 const { Header } = Layout;
 const { Text } = Typography;
 
 const AppHeader = () => {
-  const user = {
-    name: "Ravshan Kamoliddinov",
-    avatar: <Avatar size={32} icon={<UserOutlined />} />
-  };
+  const { data: user, isLoading } = useQuery({
+    queryKey: ["user"],
+    queryFn: () => userApi.me()
+  });
+  useEffect(() => {
+    userApi.me();
+  }, []);
   const navigate = useNavigate();
   const logout = () => {
     localStorage.removeItem("access_token");
     localStorage.removeItem("token");
     navigate("/login");
   };
+
+  if (isLoading) return <Spin />;
 
   const menu = (
     <Menu
@@ -69,11 +76,12 @@ const AppHeader = () => {
       <Dropdown overlay={menu} trigger={["click"]}>
         <Space style={{ cursor: "pointer" }}>
           <Avatar
-            style={{ backgroundColor: "white" }}
-            src={user.avatar}
+            style={{ backgroundColor: "#87d068" }}
             icon={<UserOutlined />}
           />
-          <Text style={{ color: "white" }}>{user.name}</Text>
+          <Text style={{ color: "white" }}>
+            {user.firstname} {user.lastname}
+          </Text>
           <DownOutlined style={{ color: "white" }} />
         </Space>
       </Dropdown>

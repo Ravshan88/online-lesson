@@ -7,10 +7,12 @@ import {
   Form,
   Space,
   message,
-  Popconfirm
+  Popconfirm,
+  Breadcrumb
 } from "antd";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { HomeOutlined, ArrowLeftOutlined } from "@ant-design/icons";
 
 export default function MaterialTestsPage() {
   const { id } = useParams();
@@ -18,6 +20,7 @@ export default function MaterialTestsPage() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingTest, setEditingTest] = useState(null);
   const [form] = Form.useForm();
+  const navigate = useNavigate();
 
   const fetchTests = async () => {
     try {
@@ -112,11 +115,36 @@ export default function MaterialTestsPage() {
       )
     }
   ];
+  const handleBack = () => {
+    navigate(-1);
+  };
 
   return (
     <div style={{ padding: 24 }}>
       <h2>Material #{id} uchun testlar</h2>
-
+      <Breadcrumb
+        style={{ marginBottom: 16 }}
+        items={[
+          {
+            title: (
+              <a href='/home'>
+                <HomeOutlined /> Bosh sahifa
+              </a>
+            )
+          },
+          {
+            title: <a href='/admin'>Admin panel</a>
+          },
+          {
+            title: `Material ${id}`
+          }
+        ]}
+      />
+      <div style={{ marginBottom: 16 }}>
+        <Button icon={<ArrowLeftOutlined />} onClick={handleBack}>
+          Orqaga
+        </Button>
+      </div>
       <Button
         type='primary'
         onClick={() => {
