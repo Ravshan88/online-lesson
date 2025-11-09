@@ -9,6 +9,7 @@ import AdminProtectedRoute from "./components/AdminProtectedRoute";
 import AdminPage from "./pages/AdminPage";
 import MaterialTestsPage from "./pages/MaterialTestsPage";
 import TestPage from "./pages/TestPage";
+import RandomTestPage from "./pages/RandomTestPage";
 import NotFoundPage from "./pages/NotFoundPage";
 function App() {
   return (
@@ -61,6 +62,14 @@ function App() {
           element={
             <ProtectedRoute>
               <TestPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path='/random-test'
+          element={
+            <ProtectedRoute>
+              <RandomTestPage />
             </ProtectedRoute>
           }
         />

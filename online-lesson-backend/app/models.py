@@ -98,3 +98,18 @@ class UserProgress(Base):
     user = relationship("User")
     attachment = relationship("Attachment")
     test = relationship("Test")
+
+
+class TestSession(Base):
+    __tablename__ = "test_sessions"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"))
+    total_questions = Column(Integer, nullable=False)
+    correct_answers = Column(Integer, nullable=False)
+    score_percentage = Column(Integer, nullable=False)  # 0-100
+    test_data = Column(JSONB, nullable=False)  # Store test questions and answers
+    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
+
+    # Relationships
+    user = relationship("User")

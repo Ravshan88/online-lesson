@@ -150,3 +150,38 @@ class MaterialProgressResponse(BaseModel):
     completed_tests: int
     test_progress: List[dict]
     percentage: float
+
+
+# =========================
+# Test Session schemas
+# =========================
+class TestSessionCreate(BaseModel):
+    num_questions: int = 30  # Default to 30 questions
+
+
+class TestSessionStart(BaseModel):
+    session_id: UUID
+    questions: List[dict]  # List of questions with id, question, options
+
+
+class TestSessionSubmit(BaseModel):
+    session_id: UUID
+    answers: dict  # {test_id: selected_answer}
+
+
+class TestSessionResult(BaseModel):
+    id: UUID
+    user_id: int
+    total_questions: int
+    correct_answers: int
+    score_percentage: int
+    test_data: dict
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class TestSessionHistory(BaseModel):
+    sessions: List[TestSessionResult]
+    total_sessions: int

@@ -1,10 +1,11 @@
 import React from "react";
-import { Layout, Avatar, Dropdown, Menu, Space, Typography } from "antd";
+import { Layout, Avatar, Dropdown, Menu, Space, Typography, Button } from "antd";
 import {
   UserOutlined,
   HomeOutlined,
   LogoutOutlined,
-  DownOutlined
+  DownOutlined,
+  TrophyOutlined
 } from "@ant-design/icons";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../assets/oxu.png";
@@ -65,18 +66,35 @@ const AppHeader = () => {
         <img src={logo} alt='' />
       </Link>
 
-      {/* User info va dropdown */}
-      <Dropdown overlay={menu} trigger={["click"]}>
-        <Space style={{ cursor: "pointer" }}>
-          <Avatar
-            style={{ backgroundColor: "white" }}
-            src={user.avatar}
-            icon={<UserOutlined />}
-          />
-          <Text style={{ color: "white" }}>{user.name}</Text>
-          <DownOutlined style={{ color: "white" }} />
-        </Space>
-      </Dropdown>
+      {/* Navigation and User info */}
+      <Space size="large">
+        <Link to="/random-test">
+          <Button 
+            type="primary" 
+            icon={<TrophyOutlined />}
+            style={{
+              background: "#faad14",
+              borderColor: "#faad14",
+              fontWeight: "bold"
+            }}
+          >
+            Yakuniy Test
+          </Button>
+        </Link>
+
+        {/* User info va dropdown */}
+        <Dropdown overlay={menu} trigger={["click"]}>
+          <Space style={{ cursor: "pointer" }}>
+            <Avatar
+              style={{ backgroundColor: "white" }}
+              src={user.avatar}
+              icon={<UserOutlined />}
+            />
+            <Text style={{ color: "white" }}>{user.name}</Text>
+            <DownOutlined style={{ color: "white" }} />
+          </Space>
+        </Dropdown>
+      </Space>
     </Header>
   );
 };

@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from . import models
 from .database import engine, get_db
-from .routers import user, auth, sections, materials, test, progress_router
+from .routers import user, auth, sections, materials, test, progress_router, test_sessions
 
 models.Base.metadata.create_all(bind=engine)
 app = FastAPI()
@@ -28,6 +28,7 @@ app.include_router(sections.router)
 app.include_router(materials.router)
 app.include_router(test.router)
 app.include_router(progress_router.router)
+app.include_router(test_sessions.router)
 
 
 # Seed default sections on startup if empty
@@ -44,10 +45,17 @@ def seed_sections():
                 {"name": "Maruza"},
                 {"name": "Amaliy"},
                 {"name": "Tajriba"},
-                {"name": "Mustaqil Ish"}
+                {"name": "Mustaqil Ish"},
+                {"name": "Yakuniy Test"}
             ]
             for data in defaults:
                 db.add(Section(**data))
             db.commit()
+        else:
+            # Check if "Yakuniy Test" exists, if not add it
+            yakuniy_test = db.query(Section).filter(Section.name == "Yakuniy Test").first()
+            if not yakuniy_test:
+                db.add(Section(name="Yakuniy Test"))
+                db.commit()
     finally:
         db.close()
