@@ -4,25 +4,18 @@ from sqlalchemy import (
     Column,
     Integer,
     String,
-    Enum,
     Text,
     ForeignKey,
     TIMESTAMP,
     func,
     UUID,
-    Table,
+    Enum,
 )
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship
 
 from .database import Base
 
-material_attachments = Table(
-    "material_attachments",
-    Base.metadata,
-    Column("material_id", Integer, ForeignKey("materials.id", ondelete="CASCADE"), primary_key=True),
-    Column("attachment_id", UUID, ForeignKey("attachments.id", ondelete="CASCADE"), primary_key=True)
-)
 
 class User(Base):
     __tablename__ = "users"
@@ -50,14 +43,13 @@ class Material(Base):
     id = Column(Integer, primary_key=True, index=True)
     section_id = Column(Integer, ForeignKey("sections.id", ondelete="CASCADE"))
     title = Column(String, nullable=False, unique=True)
+
     section = relationship("Section", back_populates="materials")
     tests = relationship(
         "Test", back_populates="material", cascade="all, delete-orphan"
     )
     attachments = relationship(
-        "Attachment",
-        secondary=material_attachments,
-        back_populates="materials"
+        "Attachment", back_populates="material", cascade="all, delete-orphan"
     )
 
 
@@ -72,14 +64,10 @@ class Attachment(Base):
     id = Column(UUID, primary_key=True, index=True)
     path = Column(Text, nullable=False)
     name = Column(String(255), nullable=False)
-    type = Column(AttachmentTypeEnum, nullable=False)
+    type = Column(Enum(AttachmentTypeEnum), nullable=False)
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
-
-    materials = relationship(
-        "Material",
-        secondary=material_attachments,
-        back_populates="attachments"
-    )
+    material_id = Column(Integer, ForeignKey("materials.id", ondelete="CASCADE"))
+    material = relationship("Material", back_populates="attachments")
 
 
 class Test(Base):
@@ -93,3 +81,20 @@ class Test(Base):
     correct_answer = Column(String, nullable=False)
 
     material = relationship("Material", back_populates="tests")
+
+
+class UserProgress(Base):
+    __tablename__ = "user_progress"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"))
+    attachment_id = Column(UUID(as_uuid=True), ForeignKey("attachments.id", ondelete="CASCADE"), nullable=True)
+    test_id = Column(Integer, ForeignKey("tests.id", ondelete="CASCADE"), nullable=True)
+
+    is_completed = Column(Integer, default=0)  # 0 = bajarilmagan, 1 = bajarilgan
+    completed_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
+
+    # Aloqalar
+    user = relationship("User")
+    attachment = relationship("Attachment")
+    test = relationship("Test")

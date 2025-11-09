@@ -13,8 +13,11 @@
     "@tanstack/react-query": "^5.90.2",
     "antd": "^5.27.4",
     "axios": "^1.12.2",
+    "jwt-decode": "^4.0.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-pageflip": "^2.0.3",
+    "react-pdf": "^10.2.0",
     "react-router-dom": "^7.9.1"
   },
   "devDependencies": {

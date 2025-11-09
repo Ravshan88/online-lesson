@@ -3,20 +3,39 @@ import { Form, Input, Button, Card, Col, Row, notification } from "antd";
 import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { userApi } from "../api/userApi";
+import { jwtDecode } from "jwt-decode";
 
 const LoginPage = () => {
   const navigate = useNavigate();
 
   const loginUser = useMutation({
     mutationFn: userApi.login,
-    onSuccess: (data) => {
-      // Backend token qaytarishi kerak
+    onSuccess: async (data) => {
+      // Store token with standardized name
+      localStorage.setItem("access_token", data.access_token);
+      // Keep backward compatibility
       localStorage.setItem("token", data.access_token);
-      notification.success({
-        message: "Xush kelibsiz!",
-        description: "Siz tizimga muvaffaqiyatli kirdingiz."
-      });
-      navigate("/home");
+
+      // Check user role from token
+      try {
+        const decoded = jwtDecode(data.access_token);
+        const userRole = decoded.role;
+
+        notification.success({
+          message: "Xush kelibsiz!",
+          description: "Siz tizimga muvaffaqiyatli kirdingiz."
+        });
+
+        // Navigate based on role
+        if (userRole === "admin") {
+          navigate("/admin");
+        } else {
+          navigate("/home");
+        }
+      } catch (error) {
+        // If token decode fails, default to home
+        navigate("/home");
+      }
     },
     onError: (error) => {
       notification.error({

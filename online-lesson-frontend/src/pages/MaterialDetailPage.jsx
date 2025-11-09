@@ -6,7 +6,6 @@ import { getMaterialById } from "../api/materialsApi";
 import { Card, Typography, Space, Button, Spin, Empty } from "antd";
 import AppHeader from "../components/AppHeader";
 import { DownloadOutlined } from "@ant-design/icons";
-import axios from "axios";
 
 const { Title, Text } = Typography;
 
@@ -42,16 +41,67 @@ export default function MaterialDetailPage() {
       </div>
     );
 
-  const { id, title, pdf_path, video_url, tests = [] } = material;
+  const { id, title, attachments = [], tests = [] } = material;
 
-  const handleOpenVideo = () => {
-    if (!video_url) return;
-    if (video_url.includes("youtube") || video_url.includes("youtu.be")) {
-      window.open(video_url, "_blank");
+  // Helper functions to extract attachments
+  const getPdfAttachment = (attachments) => {
+    if (!attachments || !Array.isArray(attachments)) return null;
+    return attachments.find(
+      (att) => att.type === "file" && att.path?.toLowerCase().endsWith(".pdf")
+    );
+  };
+
+  const getVideoAttachment = (attachments) => {
+    if (!attachments || !Array.isArray(attachments)) return null;
+    // Check for YouTube link
+    const youtubeLink = attachments.find((att) => att.type === "link");
+    if (youtubeLink) return { type: "youtube", url: youtubeLink.path, id: youtubeLink.id };
+    // Check for video file
+    const videoFile = attachments.find(
+      (att) =>
+        att.type === "file" &&
+        (att.path?.toLowerCase().endsWith(".mp4") ||
+          att.path?.toLowerCase().endsWith(".avi") ||
+          att.path?.toLowerCase().endsWith(".mov") ||
+          att.path?.toLowerCase().endsWith(".mkv"))
+    );
+    if (videoFile) return { type: "file", path: videoFile.path, id: videoFile.id };
+    return null;
+  };
+
+  const pdfAttachment = getPdfAttachment(attachments);
+  const videoAttachment = getVideoAttachment(attachments);
+
+  // Get all file attachments (not just PDFs)
+  const getAllFileAttachments = (attachments) => {
+    if (!attachments || !Array.isArray(attachments)) return [];
+    return attachments.filter((att) => att.type === "file");
+  };
+
+  const fileAttachments = getAllFileAttachments(attachments);
+
+  const handleOpenVideo = (attachmentId) => {
+    if (!videoAttachment) return;
+    if (videoAttachment.type === "youtube") {
+      window.open(videoAttachment.url, "_blank");
     } else {
-      const el = document.getElementById("material-video-player");
-      if (el) el.scrollIntoView({ behavior: "smooth" });
+      console.log(attachmentId);
+      
     }
+  };
+
+  const handleDownloadFile = (attachmentId) => {
+    // Use the get_file endpoint for any file type
+    window.open(
+      `http://localhost:8000/materials/get_file/${attachmentId}`,
+      "_blank"
+    );
+  };
+
+  const handleDownloadPdf = () => {
+    if (!pdfAttachment) return;
+    // Use the get_file endpoint
+    handleDownloadFile(pdfAttachment.id);
   };
 
   const handleOpenTests = () => {
@@ -68,21 +118,33 @@ export default function MaterialDetailPage() {
           </Title>
 
           <Space direction='vertical' style={{ width: "900px" }} size='large'>
-            <Card>
-              <Title level={2}>📘 PDF ni ochish (kitob ko‘rinishida)</Title>
-              <Button
-                type='primary'
-                icon={<DownloadOutlined />}
-              >
-                Yuklab olish
-              </Button>
-            </Card>
-
-            <Link onClick={handleOpenVideo}>
+            {pdfAttachment && (
               <Card>
-                <Title level={2}>🎬 Video</Title>
+                <Title level={2}>📘 PDF ni ochish (kitob ko‘rinishida)</Title>
+                <Button
+                  type='primary'
+                  icon={<DownloadOutlined />}
+                  onClick={handleDownloadPdf}
+                >
+                  Yuklab olish
+                </Button>
               </Card>
-            </Link>
+            )}
+
+            {videoAttachment && (
+              <Link onClick={()=>handleOpenVideo(videoAttachment.id)}>
+                <Card>
+                  <Title level={2}>🎬 Video</Title>
+                  <Button
+                    type='primary'
+                    icon={<DownloadOutlined />}
+                    onClick={() => handleDownloadFile(videoAttachment.id)}
+                  >
+                    Yuklab olish
+                  </Button>
+                </Card>
+              </Link>
+            )}
 
             <Card>
               <Title level={2}>🧠 Testlar</Title>

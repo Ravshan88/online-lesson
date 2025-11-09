@@ -1,4 +1,6 @@
 from typing import Optional, List
+from datetime import datetime
+from uuid import UUID
 
 from pydantic import BaseModel
 
@@ -15,6 +17,7 @@ class UserOut(BaseModel):
     username: str
     firstname: str
     lastname: str
+    role: str
 
     class Config:
         from_attributes = True
@@ -32,6 +35,7 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     id: Optional[int] = None
+    role: Optional[str] = None
 
 
 # Section schemas
@@ -57,13 +61,32 @@ class Test(TestBase):
 
 
 # =========================
+# Attachment schemas
+# =========================
+class AttachmentBase(BaseModel):
+    path: str
+    name: str
+    type: str  # "file" or "link"
+
+
+class AttachmentCreate(AttachmentBase):
+    material_id: int
+
+
+class Attachment(AttachmentBase):
+    id: UUID
+    material_id: int
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+# =========================
 # Material schemas
 # =========================
 class MaterialBase(BaseModel):
     title: Optional[str]
-    pdf_path: Optional[str] = None
-    video_type: Optional[str] = None  # "youtube" or "file"
-    video_url: Optional[str] = None
 
 
 class MaterialCreate(MaterialBase):
@@ -75,9 +98,10 @@ class Material(MaterialBase):
     id: int
     section_id: int
     tests: List[Test] = []  # bog‘langan testlar chiqadi
+    attachments: List[Attachment] = []  # bog‘langan attachmentlar chiqadi
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class SectionBase(BaseModel):

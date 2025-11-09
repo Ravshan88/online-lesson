@@ -27,19 +27,24 @@ def create_access_token(data: dict):
 def verify_access_token(token: str, credentials_exception):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        id: str = payload.get('user_id')
+        id: str = payload.get("user_id")
+        role: str = payload.get("role")
         if id is None:
             raise credentials_exception
-        token_data = schemas.TokenData(id=id)
+        token_data = schemas.TokenData(id=id, role=role)
     except (ExpiredSignatureError, InvalidTokenError):
         raise credentials_exception
     return token_data
 
 
-def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(database.get_db)):
-    credentials_exception = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
-                                          detail="Could not validate credentials",
-                                          headers={"WWW-Authenticate": "Bearer"})
+def get_current_user(
+    token: str = Depends(oauth2_scheme), db: Session = Depends(database.get_db)
+):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
     access_token = verify_access_token(token, credentials_exception)
     user = db.query(models.User).filter(models.User.id == access_token.id).first()
     return user

@@ -5,8 +5,10 @@ import RegisterPage from "./pages/RegisterPage";
 import MaterialsPage from "./pages/MaterialsPage";
 import MaterialDetailPage from "./pages/MaterialDetailPage";
 import ProtectedRoute from "./components/ProtectRoute";
+import AdminProtectedRoute from "./components/AdminProtectedRoute";
 import AdminPage from "./pages/AdminPage";
 import MaterialTestsPage from "./pages/MaterialTestsPage";
+import NotFoundPage from "./pages/NotFoundPage";
 function App() {
   return (
     <Router>
@@ -24,14 +26,18 @@ function App() {
         <Route
           path='/admin'
           element={
-            <ProtectedRoute>
+            <AdminProtectedRoute>
               <AdminPage />
-            </ProtectedRoute>
+            </AdminProtectedRoute>
           }
         />
         <Route
           path='/admin/material/:id/tests'
-          element={<MaterialTestsPage />}
+          element={
+            <AdminProtectedRoute>
+              <MaterialTestsPage />
+            </AdminProtectedRoute>
+          }
         />
         <Route
           path='/:section/:id'
@@ -49,6 +55,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route path='*' element={<NotFoundPage />} />
       </Routes>
     </Router>
   );

@@ -89,14 +89,41 @@ export default function MaterialsTable({ sectionId }) {
     setIsModalOpen(true);
   };
 
+  // Helper functions to extract attachments
+  const getPdfAttachment = (attachments) => {
+    if (!attachments || !Array.isArray(attachments)) return null;
+    return attachments.find(
+      (att) => att.type === "file" && att.path?.toLowerCase().endsWith(".pdf")
+    );
+  };
+
+  const getVideoAttachment = (attachments) => {
+    if (!attachments || !Array.isArray(attachments)) return null;
+    // Check for YouTube link
+    const youtubeLink = attachments.find((att) => att.type === "link");
+    if (youtubeLink) return { type: "youtube", url: youtubeLink.path };
+    // Check for video file
+    const videoFile = attachments.find(
+      (att) =>
+        att.type === "file" &&
+        (att.path?.toLowerCase().endsWith(".mp4") ||
+          att.path?.toLowerCase().endsWith(".avi") ||
+          att.path?.toLowerCase().endsWith(".mov") ||
+          att.path?.toLowerCase().endsWith(".mkv"))
+    );
+    if (videoFile) return { type: "file", path: videoFile.path };
+    return null;
+  };
+
   const openEditModal = (record) => {
     setEditing(record);
+    const videoAtt = getVideoAttachment(record.attachments);
     form.setFieldsValue({
       title: record.title,
-      video_type: record.video_type || null,
-      video_url: record.video_type === "youtube" ? record.video_url : null
+      video_type: videoAtt?.type || null,
+      video_url: videoAtt?.type === "youtube" ? videoAtt.url : null
     });
-    SetHasVideoFile(record.video_type);
+    SetHasVideoFile(videoAtt?.type || null);
     setIsModalOpen(true);
   };
 
@@ -158,21 +185,25 @@ export default function MaterialsTable({ sectionId }) {
     },
     {
       title: "PDF",
-      dataIndex: "pdf_path",
-      render: (p) => (p ? <Tag color='blue'>Yes</Tag> : <Tag>—</Tag>),
+      dataIndex: "attachments",
+      render: (attachments) => {
+        const pdfAtt = getPdfAttachment(attachments);
+        return pdfAtt ? <Tag color='blue'>Yes</Tag> : <Tag>—</Tag>;
+      },
       width: 100
     },
     {
       title: "Video",
-      dataIndex: "video_type",
-      render: (_, record) =>
-        record.video_type ? (
-          <Tag color={record.video_type === "youtube" ? "red" : "green"}>
-            {record.video_type}
+      dataIndex: "attachments",
+      render: (attachments) => {
+        const videoAtt = getVideoAttachment(attachments);
+        if (!videoAtt) return <Tag>—</Tag>;
+        return (
+          <Tag color={videoAtt.type === "youtube" ? "red" : "green"}>
+            {videoAtt.type}
           </Tag>
-        ) : (
-          <Tag>—</Tag>
-        ),
+        );
+      },
       width: 120
     },
     {
@@ -265,11 +296,17 @@ export default function MaterialsTable({ sectionId }) {
             <Upload beforeUpload={beforePdfUpload} maxCount={1} accept='.pdf'>
               <Button icon={<UploadOutlined />}>PDF yuklash</Button>
             </Upload>
-            {editing?.pdf_path && !pdfFile && (
-              <div style={{ marginTop: 8, fontSize: 12, color: "#666" }}>
-                Hozirgi fayl: {editing.pdf_path}
-              </div>
-            )}
+            {(() => {
+              const pdfAtt = getPdfAttachment(editing?.attachments);
+              return (
+                pdfAtt &&
+                !pdfFile && (
+                  <div style={{ marginTop: 8, fontSize: 12, color: "#666" }}>
+                    Hozirgi fayl: {pdfAtt.name}
+                  </div>
+                )
+              );
+            })()}
           </Form.Item>
 
           <Form.Item
@@ -342,19 +379,24 @@ export default function MaterialsTable({ sectionId }) {
                     >
                       <Button icon={<UploadOutlined />}>Video yuklash</Button>
                     </Upload>
-                    {editing?.video_url &&
-                      editing.video_type === "file" &&
-                      !videoFile && (
-                        <div
-                          style={{
-                            marginTop: 8,
-                            fontSize: 12,
-                            color: "#666"
-                          }}
-                        >
-                          Hozirgi video: {editing.video_url}
-                        </div>
-                      )}
+                    {(() => {
+                      const videoAtt = getVideoAttachment(editing?.attachments);
+                      return (
+                        videoAtt &&
+                        videoAtt.type === "file" &&
+                        !videoFile && (
+                          <div
+                            style={{
+                              marginTop: 8,
+                              fontSize: 12,
+                              color: "#666"
+                            }}
+                          >
+                            Hozirgi video: {videoAtt.path}
+                          </div>
+                        )
+                      );
+                    })()}
                   </Form.Item>
                 ) : null
               }
