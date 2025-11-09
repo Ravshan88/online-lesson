@@ -110,6 +110,7 @@ class TestSession(Base):
     score_percentage = Column(Integer, nullable=False)  # 0-100
     test_data = Column(JSONB, nullable=False)  # Store test questions and answers
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
+    passed = Column(Integer, default=0)  # 0 = failed, 1 = passed (≥75%)
 
     # Relationships
     user = relationship("User")

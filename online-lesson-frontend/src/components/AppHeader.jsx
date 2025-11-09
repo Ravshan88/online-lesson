@@ -1,5 +1,5 @@
-import React from "react";
-import { Layout, Avatar, Dropdown, Menu, Space, Typography, Button } from "antd";
+import React, { useEffect } from "react";
+import { Layout, Avatar, Dropdown, Menu, Space, Typography, Spin, Button } from "antd";
 import {
   UserOutlined,
   HomeOutlined,
@@ -8,21 +8,28 @@ import {
   TrophyOutlined
 } from "@ant-design/icons";
 import { Link, useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { userApi } from "../api/userApi";
 import logo from "../assets/oxu.png";
 const { Header } = Layout;
 const { Text } = Typography;
 
 const AppHeader = () => {
-  const user = {
-    name: "Ravshan Kamoliddinov",
-    avatar: <Avatar size={32} icon={<UserOutlined />} />
-  };
+  const { data: user, isLoading } = useQuery({
+    queryKey: ["user"],
+    queryFn: () => userApi.me()
+  });
+  useEffect(() => {
+    userApi.me();
+  }, []);
   const navigate = useNavigate();
   const logout = () => {
     localStorage.removeItem("access_token");
     localStorage.removeItem("token");
     navigate("/login");
   };
+
+  if (isLoading) return <Spin />;
 
   const menu = (
     <Menu
@@ -67,34 +74,19 @@ const AppHeader = () => {
       </Link>
 
       {/* Navigation and User info */}
-      <Space size="large">
-        <Link to="/random-test">
-          <Button 
-            type="primary" 
-            icon={<TrophyOutlined />}
-            style={{
-              background: "#faad14",
-              borderColor: "#faad14",
-              fontWeight: "bold"
-            }}
-          >
-            Yakuniy Test
-          </Button>
-        </Link>
-
-        {/* User info va dropdown */}
-        <Dropdown overlay={menu} trigger={["click"]}>
-          <Space style={{ cursor: "pointer" }}>
-            <Avatar
-              style={{ backgroundColor: "white" }}
-              src={user.avatar}
-              icon={<UserOutlined />}
-            />
-            <Text style={{ color: "white" }}>{user.name}</Text>
-            <DownOutlined style={{ color: "white" }} />
-          </Space>
-        </Dropdown>
-      </Space>
+      {/* User info va dropdown */}
+      <Dropdown overlay={menu} trigger={["click"]}>
+        <Space style={{ cursor: "pointer" }}>
+          <Avatar
+            style={{ backgroundColor: "#87d068" }}
+            icon={<UserOutlined />}
+          />
+          <Text style={{ color: "white" }}>
+            {user.firstname} {user.lastname}
+          </Text>
+          <DownOutlined style={{ color: "white" }} />
+        </Space>
+      </Dropdown>
     </Header>
   );
 };

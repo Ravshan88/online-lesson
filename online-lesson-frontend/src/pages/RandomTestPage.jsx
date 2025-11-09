@@ -5,7 +5,6 @@ import {
   checkTestStatus,
   startTestSession,
   submitTestSession,
-  getTestHistory,
   getTestSession
 } from "../api/testSessionsApi";
 import {
@@ -34,7 +33,8 @@ import {
   CloseCircleOutlined,
   TrophyOutlined,
   HistoryOutlined,
-  RocketOutlined
+  RocketOutlined,
+  FileTextOutlined
 } from "@ant-design/icons";
 import AppHeader from "../components/AppHeader";
 
@@ -47,8 +47,6 @@ export default function RandomTestPage() {
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState({});
   const [results, setResults] = useState(null);
-  const [showHistory, setShowHistory] = useState(false);
-  const [history, setHistory] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
   // Check test status on mount
@@ -92,7 +90,7 @@ export default function RandomTestPage() {
 
   // Submit test mutation
   const submitMutation = useMutation({
-    mutationFn: (data) => submitTestSession(data.sessionId, data.answers),
+    mutationFn: (data) => submitTestSession(data.sessionId, data.answers, data.questionIds),
     onSuccess: (data) => {
       setResults(data);
       setTestState("submitted");
@@ -118,6 +116,9 @@ export default function RandomTestPage() {
   };
 
   const handleSubmit = () => {
+    // Get all question IDs from the session
+    const questionIds = questions.map(q => q.id);
+    
     if (Object.keys(answers).length < questions.length) {
       Modal.confirm({
         title: "Barcha savollarga javob berilmagan",
@@ -127,12 +128,12 @@ export default function RandomTestPage() {
         okText: "Ha, yuborish",
         cancelText: "Yo'q, qaytish",
         onOk: () => {
-          submitMutation.mutate({ sessionId, answers });
+          submitMutation.mutate({ sessionId, answers, questionIds });
         }
       });
       return;
     }
-    submitMutation.mutate({ sessionId, answers });
+    submitMutation.mutate({ sessionId, answers, questionIds });
   };
 
   const handleNextQuestion = () => {
@@ -149,16 +150,6 @@ export default function RandomTestPage() {
 
   const handleQuestionJump = (index) => {
     setCurrentQuestionIndex(index);
-  };
-
-  const loadHistory = async () => {
-    try {
-      const data = await getTestHistory(10);
-      setHistory(data.sessions);
-      setShowHistory(true);
-    } catch (error) {
-      message.error("Tarixni yuklashda xatolik");
-    }
   };
 
   const getScoreColor = (percentage) => {
@@ -220,77 +211,37 @@ export default function RandomTestPage() {
 
               <Divider />
 
-              <Row gutter={[24, 24]} style={{ marginTop: "32px" }}>
-                <Col xs={24} md={12}>
-                  <Card
-                    hoverable
-                    style={{
-                      borderRadius: "12px",
-                      border: "2px solid #1890ff"
-                    }}
-                  >
-                    <Title level={4}>
-                      <CheckCircleOutlined style={{ color: "#52c41a" }} /> Test
-                      Boshlash
-                    </Title>
-                    <Paragraph type='secondary'>
-                      Yakuniy testni boshlang
-                    </Paragraph>
-
-                    <div style={{ marginTop: "24px" }}>
-                      <Statistic
-                        title="Testdagi savollar soni"
-                        value={testStatus?.test_question_count || 0}
-                        prefix={<CheckCircleOutlined />}
-                        valueStyle={{ color: "#1890ff" }}
-                      />
-                      
-                      <Text type='secondary' style={{ display: "block", marginTop: "8px" }}>
-                        Jami mavjud testlar: {testStatus?.total_available_tests || 0}
-                      </Text>
-
-                      <Button
-                        type='primary'
-                        size='large'
-                        block
-                        onClick={handleStartTest}
-                        icon={<RocketOutlined />}
-                        style={{ marginTop: "24px" }}
-                      >
-                        Testni Boshlash
-                      </Button>
-                    </div>
-                  </Card>
-                </Col>
-
-                <Col xs={24} md={12}>
-                  <Card
-                    hoverable
-                    style={{
-                      borderRadius: "12px",
-                      border: "2px solid #722ed1"
-                    }}
-                  >
-                    <Title level={4}>
-                      <HistoryOutlined style={{ color: "#722ed1" }} /> Test
-                      Tarixi
-                    </Title>
-                    <Paragraph type='secondary'>
-                      O'tgan testlaringiz natijalarini ko'ring
-                    </Paragraph>
-
+              <div style={{ maxWidth: "500px", margin: "32px auto" }}>
+                  <div style={{ marginTop: "24px" }}>
+                    <Row gutter={16}>
+                      <Col span={12}>
+                        <Statistic
+                          title="Testdagi savollar soni:"
+                          value={testStatus?.test_question_count || 0}
+                          valueStyle={{ color: "#1890ff" }}
+                        />
+                      </Col>
+                      <Col span={12}>
+                        <Statistic
+                          title="O'tish foizi:"
+                          value={75}
+                          suffix="%"
+                          valueStyle={{ color: "#52c41a" }}
+                        />
+                      </Col>
+                    </Row>
                     <Button
+                      type='primary'
                       size='large'
                       block
-                      onClick={loadHistory}
-                      icon={<HistoryOutlined />}
+                      onClick={handleStartTest}
+                      icon={<RocketOutlined />}
                       style={{ marginTop: "24px" }}
                     >
-                      Tarixni Ko'rish
+                      Testni Boshlash
                     </Button>
-                  </Card>
-                </Col>
-              </Row>
+                  </div>
+              </div>
 
               <Divider />
 
@@ -312,60 +263,6 @@ export default function RandomTestPage() {
             </Card>
           </div>
         </div>
-
-        {/* History Modal */}
-        <Modal
-          title='Test Tarixi'
-          open={showHistory}
-          onCancel={() => setShowHistory(false)}
-          footer={null}
-          width={700}
-        >
-          {history.length === 0 ? (
-            <Empty description='Hali test topshirilmagan' />
-          ) : (
-            <Timeline>
-              {history.map((session, index) => (
-                <Timeline.Item
-                  key={session.id}
-                  color={
-                    session.score_percentage >= 70 ? "green" : "orange"
-                  }
-                >
-                  <Card size='small' style={{ marginBottom: "8px" }}>
-                    <Row gutter={16}>
-                      <Col span={12}>
-                        <Statistic
-                          title='Natija'
-                          value={session.score_percentage}
-                          suffix='%'
-                          valueStyle={{
-                            color: getScoreColor(session.score_percentage)
-                          }}
-                        />
-                      </Col>
-                      <Col span={12}>
-                        <Statistic
-                          title="To'g'ri javoblar"
-                          value={session.correct_answers}
-                          suffix={`/ ${session.total_questions}`}
-                        />
-                      </Col>
-                    </Row>
-                    <div style={{ marginTop: "8px" }}>
-                      <Tag color={getScoreColor(session.score_percentage)}>
-                        {getScoreStatus(session.score_percentage)}
-                      </Tag>
-                      <Text type='secondary' style={{ fontSize: "12px" }}>
-                        {new Date(session.created_at).toLocaleString("uz-UZ")}
-                      </Text>
-                    </div>
-                  </Card>
-                </Timeline.Item>
-              ))}
-            </Timeline>
-          )}
-        </Modal>
       </div>
     );
   }
@@ -373,6 +270,7 @@ export default function RandomTestPage() {
   // Already taken screen
   if (testState === "already_taken") {
     const percentage = results?.score_percentage || 0;
+    const passed = results?.passed === 1;
     
     return (
       <div>
@@ -386,8 +284,11 @@ export default function RandomTestPage() {
               }}
             >
               <Result
-                status="info"
-                icon={<CheckCircleOutlined style={{ fontSize: "72px", color: "#1890ff" }} />}
+                status={passed ? "success" : "warning"}
+                icon={passed ? 
+                  <CheckCircleOutlined style={{ fontSize: "72px", color: "#52c41a" }} /> :
+                  <CloseCircleOutlined style={{ fontSize: "72px", color: "#ff4d4f" }} />
+                }
                 title={
                   <Title level={2}>
                     Siz allaqachon yakuniy testni topshirgansiz
@@ -426,6 +327,15 @@ export default function RandomTestPage() {
                             )}
                           />
                         </div>
+                        <div style={{ marginTop: "16px" }}>
+                          {!passed && (
+                            <div style={{ marginTop: "8px" }}>
+                              <Text type='secondary' style={{ fontSize: "14px" }}>
+                                O'tish uchun kamida 75% ball kerak
+                              </Text>
+                            </div>
+                          )}
+                        </div>
                         <Text type='secondary' style={{ display: "block", marginTop: "16px" }}>
                           Test topshirilgan: {new Date(results.created_at).toLocaleString("uz-UZ")}
                         </Text>
@@ -433,7 +343,28 @@ export default function RandomTestPage() {
                     )}
                   </Space>
                 }
-                extra={[
+                extra={passed ? [
+                  <Button
+                    size='large'
+                    key='certificate'
+                    type='primary'
+                    icon={<FileTextOutlined />}
+                    onClick={() => navigate(`/certificate/${results.id}`)}
+                    style={{
+                      background: "#52c41a",
+                      borderColor: "#52c41a"
+                    }}
+                  >
+                    Sertifikatni Ko'rish
+                  </Button>,
+                  <Button
+                    size='large'
+                    key='home'
+                    onClick={() => navigate("/home")}
+                  >
+                    Bosh sahifa
+                  </Button>
+                ] : [
                   <Button
                     size='large'
                     key='home'
@@ -737,6 +668,7 @@ export default function RandomTestPage() {
   // Results screen
   if (testState === "submitted" && results) {
     const percentage = results.score_percentage;
+    const passed = results.passed === 1;
     const testData = results.test_data.results;
 
     return (
@@ -751,14 +683,12 @@ export default function RandomTestPage() {
               }}
             >
               <Result
-                status={percentage >= 70 ? "success" : percentage >= 40 ? "warning" : "error"}
+                status={passed ? "success" : "warning"}
                 title={
                   <Title level={2}>
-                    {percentage >= 70
-                      ? "🎉 Ajoyib natija!"
-                      : percentage >= 40
-                      ? "📊 Yaxshi urinish!"
-                      : "📚 Ko'proq mashq qiling!"}
+                    {passed
+                      ? "🎉 Tabriklaymiz!"
+                      : "📊 Yaxshi urinish!"}
                   </Title>
                 }
                 subTitle={
@@ -787,13 +717,50 @@ export default function RandomTestPage() {
                         </div>
                       )}
                     />
+                    <div style={{ marginTop: "16px" }}>
+                      {!passed && (
+                        <div style={{ marginTop: "12px" }}>
+                          <Text type='secondary' style={{ fontSize: "14px" }}>
+                            O'tish uchun kamida 75% ball kerak edi
+                          </Text>
+                        </div>
+                      )}
+                      {passed && (
+                        <div style={{ marginTop: "12px" }}>
+                          <Text type='success' style={{ fontSize: "14px" }}>
+                            Siz testdan muvaffaqiyatli o'tdingiz!
+                          </Text>
+                        </div>
+                      )}
+                    </div>
                   </Space>
                 }
-                extra={[
+                extra={passed ? [
                   <Button
                     type='primary'
                     size='large'
+                    key='certificate'
+                    icon={<FileTextOutlined />}
+                    onClick={() => navigate(`/certificate/${results.id}`)}
+                    style={{
+                      background: "#52c41a",
+                      borderColor: "#52c41a"
+                    }}
+                  >
+                    Sertifikatni Ko'rish
+                  </Button>,
+                  <Button
+                    size='large'
                     key='home'
+                    onClick={() => navigate("/home")}
+                  >
+                    Bosh sahifa
+                  </Button>
+                ] : [
+                  <Button
+                    size='large'
+                    key='home'
+                    type='primary'
                     onClick={() => navigate("/home")}
                   >
                     Bosh sahifa

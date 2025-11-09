@@ -15,10 +15,11 @@ export const startTestSession = async (numQuestions = 30) => {
 };
 
 // Submit test session answers
-export const submitTestSession = async (sessionId, answers) => {
+export const submitTestSession = async (sessionId, answers, questionIds) => {
   const res = await axiosClient.post("/test-sessions/submit", {
     session_id: sessionId,
-    answers: answers
+    answers: answers,
+    question_ids: questionIds
   });
   return res.data;
 };

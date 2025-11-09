@@ -16,10 +16,16 @@ import {
   Empty,
   Checkbox,
   Progress as AntProgress,
-  message
+  message,
+  Progress,
+  Breadcrumb
 } from "antd";
 import AppHeader from "../components/AppHeader";
-import { DownloadOutlined } from "@ant-design/icons";
+import {
+  DownloadOutlined,
+  ArrowLeftOutlined,
+  HomeOutlined
+} from "@ant-design/icons";
 
 const { Title, Text } = Typography;
 
@@ -162,11 +168,42 @@ export default function MaterialDetailPage() {
     navigate(`/test/${id}`);
   };
 
+  const handleBack = () => {
+    navigate(-1);
+  };
+
   return (
     <div>
       <AppHeader />
       <div className='p-6 flex justify-center'>
         <Card className='border-r-2 w-full flex justify-center'>
+          <Breadcrumb
+            style={{ marginBottom: 16 }}
+            items={[
+              {
+                title: (
+                  <a href='/home'>
+                    <HomeOutlined /> Bosh sahifa
+                  </a>
+                )
+              },
+              {
+                title: (
+                  <a onClick={() => navigate(-1)} style={{ cursor: "pointer" }}>
+                    {section}
+                  </a>
+                )
+              },
+              {
+                title: title.charAt(0).toUpperCase() + title.substring(1)
+              }
+            ]}
+          />
+          <div style={{ marginBottom: 16 }}>
+            <Button icon={<ArrowLeftOutlined />} onClick={handleBack}>
+              Orqaga
+            </Button>
+          </div>
           <Title level={2} className='flex justify-center'>
             {title.charAt(0).toUpperCase() + title.substring(1)}
           </Title>
@@ -196,9 +233,7 @@ export default function MaterialDetailPage() {
                   }}
                 >
                   <div>
-                    <Title level={2}>
-                      📘 PDF ni ochish (kitob ko'rinishida)
-                    </Title>
+                    <Title level={2}>📘 PDF</Title>
                     <Button
                       type='primary'
                       icon={<DownloadOutlined />}
@@ -208,13 +243,13 @@ export default function MaterialDetailPage() {
                       Yuklab olish
                     </Button>
                   </div>
-                  <Checkbox
-                    checked={progress?.pdf_completed || false}
-                    onChange={handlePdfCheckbox}
-                    disabled={progress?.pdf_completed}
-                  >
-                    Ko'rib chiqildi
-                  </Checkbox>
+                  {progress?.pdf_completed && (
+                    <Progress
+                      type='circle'
+                      percent={progress?.pdf_completed ? 100 : 0}
+                      size={40}
+                    />
+                  )}
                 </div>
               </Card>
             )}
@@ -249,13 +284,15 @@ export default function MaterialDetailPage() {
                       )}
                     </Space>
                   </div>
-                  <Checkbox
-                    checked={progress?.video_completed || false}
-                    onChange={handleVideoCheckbox}
-                    disabled={progress?.video_completed}
-                  >
-                    Ko'rib chiqildi
-                  </Checkbox>
+                  {progress?.video_completed && (
+                    <>
+                      <Progress
+                        type='circle'
+                        percent={progress?.video_completed ? 100 : 0}
+                        size={40}
+                      />
+                    </>
+                  )}
                 </div>
               </Card>
             )}
@@ -263,17 +300,36 @@ export default function MaterialDetailPage() {
             <Card>
               <Title level={2}>🧠 Testlar</Title>
               {tests && tests.length > 0 ? (
-                <>
-                  <Text>
-                    {progress?.completed_tests || 0} / {tests.length} ta test
-                    yechildi
-                  </Text>
-                  <div style={{ marginTop: 12 }}>
-                    <Button type='dashed' onClick={handleOpenTests}>
-                      Testni yechish
-                    </Button>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center"
+                  }}
+                >
+                  <div>
+                    <Text>
+                      {progress?.completed_tests || 0} / {tests.length} ta test
+                      yechildi
+                    </Text>
+                    <div style={{ marginTop: 12 }}>
+                      <Button type='dashed' onClick={handleOpenTests}>
+                        Testni yechish
+                      </Button>
+                    </div>
                   </div>
-                </>
+                  {progress?.completed_tests ? (
+                    <>
+                      <Progress
+                        type='circle'
+                        percent={progress?.completed_tests ? 100 : 0}
+                        size={40}
+                      />
+                    </>
+                  ) : (
+                    ""
+                  )}
+                </div>
               ) : (
                 <Text type='secondary'>Test mavjud emas</Text>
               )}

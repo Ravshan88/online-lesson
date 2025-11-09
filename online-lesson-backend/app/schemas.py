@@ -167,6 +167,7 @@ class TestSessionStart(BaseModel):
 class TestSessionSubmit(BaseModel):
     session_id: UUID
     answers: dict  # {test_id: selected_answer}
+    question_ids: List[int]  # All question IDs in the test session
 
 
 class TestSessionResult(BaseModel):
@@ -175,6 +176,7 @@ class TestSessionResult(BaseModel):
     total_questions: int
     correct_answers: int
     score_percentage: int
+    passed: int  # 0 = failed, 1 = passed
     test_data: dict
     created_at: datetime
 

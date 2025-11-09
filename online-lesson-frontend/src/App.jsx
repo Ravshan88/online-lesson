@@ -10,6 +10,7 @@ import AdminPage from "./pages/AdminPage";
 import MaterialTestsPage from "./pages/MaterialTestsPage";
 import TestPage from "./pages/TestPage";
 import RandomTestPage from "./pages/RandomTestPage";
+import CertificatePage from "./pages/CertificatePage";
 import NotFoundPage from "./pages/NotFoundPage";
 function App() {
   return (
@@ -70,6 +71,14 @@ function App() {
           element={
             <ProtectedRoute>
               <RandomTestPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path='/certificate/:sessionId'
+          element={
+            <ProtectedRoute>
+              <CertificatePage />
             </ProtectedRoute>
           }
         />
