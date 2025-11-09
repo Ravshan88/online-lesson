@@ -1,7 +1,8 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueries } from "@tanstack/react-query";
 import { getMaterialsBySection } from "../api/materialsApi";
-import { Card, Row, Col, Typography, Spin, Tag, Empty } from "antd";
+import { getMaterialProgress } from "../api/progressApi";
+import { Card, Row, Col, Typography, Spin, Tag, Empty, Progress } from "antd";
 import AppHeader from "../components/AppHeader";
 
 const { Title, Paragraph } = Typography;
@@ -13,6 +14,16 @@ export default function MaterialsPage() {
   const { data: materials = [], isLoading } = useQuery({
     queryKey: ["materials", id],
     queryFn: () => getMaterialsBySection(id)
+  });
+
+  // Fetch progress for all materials
+  const progressQueries = useQueries({
+    queries: materials.map((material) => ({
+      queryKey: ["progress", material.id],
+      queryFn: () => getMaterialProgress(material.id),
+      enabled: !!material.id,
+      retry: false
+    }))
   });
 
   if (isLoading) {
@@ -42,15 +53,36 @@ export default function MaterialsPage() {
       <div className='p-6'>
         <Title className=' flex justify-center'>{section}</Title>
         <Row className='p-6' gutter={[16, 16]}>
-          {materials.map((m, i) => (
-            <Col key={m.id} onClick={() => handleCardClick(m.id)}>
-              <Card hoverable>
-                <Title level={5}>
-                  {m.title.charAt(0).toUpperCase() + m.title.substring(1)}
-                </Title>
-              </Card>
-            </Col>
-          ))}
+          {materials.map((m, i) => {
+            const progressData = progressQueries[i]?.data;
+            const percentage = progressData?.percentage || 0;
+            return (
+              <Col key={m.id} onClick={() => handleCardClick(m.id)}>
+                <Card hoverable>
+                  <Title level={5}>
+                    {m.title.charAt(0).toUpperCase() + m.title.substring(1)}
+                  </Title>
+                  {progressData && (
+                    <div style={{ marginTop: 12 }}>
+                      <Progress
+                        percent={percentage}
+                        size='small'
+                        status={percentage === 100 ? "success" : "active"}
+                      />
+                      <div
+                        style={{ marginTop: 4, fontSize: 12, color: "#666" }}
+                      >
+                        {progressData.completed_tests} /{" "}
+                        {progressData.total_tests} test
+                        {progressData.pdf_completed && " • PDF"}
+                        {progressData.video_completed && " • Video"}
+                      </div>
+                    </div>
+                  )}
+                </Card>
+              </Col>
+            );
+          })}
         </Row>
       </div>
     </div>

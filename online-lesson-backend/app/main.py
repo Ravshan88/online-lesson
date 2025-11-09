@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from . import models
 from .database import engine, get_db
-from .routers import user, auth, sections, materials, test
+from .routers import user, auth, sections, materials, test, progress_router
 
 models.Base.metadata.create_all(bind=engine)
 app = FastAPI()
@@ -27,6 +27,7 @@ app.include_router(auth.router)
 app.include_router(sections.router)
 app.include_router(materials.router)
 app.include_router(test.router)
+app.include_router(progress_router.router)
 
 
 # Seed default sections on startup if empty

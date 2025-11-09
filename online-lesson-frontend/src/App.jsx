@@ -8,6 +8,7 @@ import ProtectedRoute from "./components/ProtectRoute";
 import AdminProtectedRoute from "./components/AdminProtectedRoute";
 import AdminPage from "./pages/AdminPage";
 import MaterialTestsPage from "./pages/MaterialTestsPage";
+import TestPage from "./pages/TestPage";
 import NotFoundPage from "./pages/NotFoundPage";
 function App() {
   return (
@@ -52,6 +53,14 @@ function App() {
           element={
             <ProtectedRoute>
               <MaterialDetailPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path='/test/:id'
+          element={
+            <ProtectedRoute>
+              <TestPage />
             </ProtectedRoute>
           }
         />

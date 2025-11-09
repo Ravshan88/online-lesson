@@ -114,3 +114,39 @@ class Section(SectionBase):
 
     class Config:
         from_attributes = True
+
+
+class ProgressBase(BaseModel):
+    user_id: int
+    attachment_id: Optional[UUID] = None
+    test_id: Optional[int] = None
+
+
+class ProgressCreate(ProgressBase):
+    pass
+
+
+class ProgressResponse(ProgressBase):
+    id: int
+    is_completed: bool
+    completed_at: Optional[datetime]
+
+    class Config:
+        from_attributes = True
+
+
+class TestSubmission(BaseModel):
+    material_id: int
+    answers: dict  # {test_id: selected_answer}
+
+
+class MaterialProgressResponse(BaseModel):
+    material_id: int
+    pdf_completed: bool
+    pdf_attachment_id: Optional[UUID] = None
+    video_completed: bool
+    video_attachment_id: Optional[UUID] = None
+    total_tests: int
+    completed_tests: int
+    test_progress: List[dict]
+    percentage: float
