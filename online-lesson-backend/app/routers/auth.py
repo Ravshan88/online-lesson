@@ -17,13 +17,13 @@ def login(user_credentials: schemas.UserLogin, db: Session = Depends(database.ge
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
+            detail="Username yoki parol noto‘g‘ri",
         )
 
     if not user_credentials.password == user.password:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
+            detail="Username yoki parol noto‘g‘ri",
         )
 
     # if not utils.verify_password(user_credentials.password, user.password):

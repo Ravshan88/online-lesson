@@ -14,7 +14,7 @@ const RegisterPage = () => {
         message: "Muvaffaqiyatli!",
         description: "Ro‘yxatdan o‘tish yakunlandi. Endi login qiling."
       });
-      navigate("/");
+      navigate("/login");
     },
     onError: (error) => {
       notification.error({

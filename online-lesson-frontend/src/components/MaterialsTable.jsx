@@ -12,7 +12,7 @@ import {
   Tag,
   message
 } from "antd";
-import { UploadOutlined, PlusOutlined } from "@ant-design/icons";
+import { UploadOutlined, PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
 import {
   getMaterialsBySection,
@@ -179,7 +179,7 @@ export default function MaterialsTable({ sectionId }) {
       width: 70
     },
     {
-      title: "Title",
+      title: "Nomi",
       dataIndex: "title",
       render: (t) => t || "—"
     },
@@ -213,7 +213,7 @@ export default function MaterialsTable({ sectionId }) {
       width: 100
     },
     {
-      title: "Amallar",
+      title: "Testlar",
       key: "actions",
       render: (_, record) => (
         <div style={{ display: "flex", gap: 8 }}>
@@ -227,18 +227,18 @@ export default function MaterialsTable({ sectionId }) {
       )
     },
     {
-      title: "Actions",
+      title: "Amallar",
       key: "actions",
       width: 180,
       render: (_, record) => (
         <Space>
-          <Button onClick={() => openEditModal(record)}>Edit</Button>
+          <Button onClick={() => openEditModal(record)}><EditOutlined/></Button>
           <Popconfirm
             title='Oʻchirishni tasdiqlaysizmi?'
             onConfirm={() => handleDelete(record.id)}
           >
             <Button danger loading={deleteMut.isLoading}>
-              Delete
+              <DeleteOutlined/>
             </Button>
           </Popconfirm>
         </Space>

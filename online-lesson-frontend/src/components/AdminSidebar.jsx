@@ -31,9 +31,11 @@ export default function AdminSidebar({ selectedSectionId, onSelect }) {
         style={{ borderRight: 0 }}
         onClick={({ key }) => onSelect(Number(key))}
       >
-        {sections.map((s) => (
-          <Menu.Item key={s.id}>{s.name}</Menu.Item>
-        ))}
+        {sections
+          .filter((section) => section.name !== "Yakuniy Test")
+          .map((s) => (
+            <Menu.Item key={s.id}>{s.name}</Menu.Item>
+          ))}
       </Menu>
     </div>
   );

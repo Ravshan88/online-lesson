@@ -25,7 +25,6 @@ const AppHeader = () => {
   const navigate = useNavigate();
   const logout = () => {
     localStorage.removeItem("access_token");
-    localStorage.removeItem("token");
     navigate("/login");
   };
 

@@ -11,10 +11,7 @@ const LoginPage = () => {
   const loginUser = useMutation({
     mutationFn: userApi.login,
     onSuccess: async (data) => {
-      // Store token with standardized name
       localStorage.setItem("access_token", data.access_token);
-      // Keep backward compatibility
-      localStorage.setItem("token", data.access_token);
 
       // Check user role from token
       try {
@@ -34,7 +31,10 @@ const LoginPage = () => {
         }
       } catch (error) {
         // If token decode fails, default to home
-        navigate("/home");
+        notification.error({
+          message: "Login xatosi!",
+          description: "Xatolik yuzaga keldi, qayta urinib ko`ring"
+        });
       }
     },
     onError: (error) => {
