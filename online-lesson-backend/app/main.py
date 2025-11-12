@@ -38,6 +38,18 @@ def seed_sections():
     from .database import SessionLocal
 
     db = SessionLocal()
+    admin = db.query(models.User).filter(models.User.role == 'admin').first()
+    print(admin.firstname)
+    if not admin:
+        new_admin = models.User(
+            username="ravshan",
+            firstname="Ravshan",
+            lastname="Kamoliddinov",
+            role="admin",
+            password="admin123"
+        )
+        db.add(new_admin)
+        db.commit()
     try:
         count = db.query(Section).count()
         if count == 0:
