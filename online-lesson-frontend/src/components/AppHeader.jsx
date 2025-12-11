@@ -1,5 +1,14 @@
 import React, { useEffect } from "react";
-import { Layout, Avatar, Dropdown, Menu, Space, Typography, Spin, Button } from "antd";
+import {
+  Layout,
+  Avatar,
+  Dropdown,
+  Menu,
+  Space,
+  Typography,
+  Spin,
+  Button
+} from "antd";
 import {
   UserOutlined,
   HomeOutlined,
@@ -36,9 +45,9 @@ const AppHeader = () => {
         {
           key: "home",
           label: (
-            <a href='/home'>
+            <Link to='/home'>
               <HomeOutlined /> Home
-            </a>
+            </Link>
           )
         },
         {
@@ -63,27 +72,37 @@ const AppHeader = () => {
         justifyContent: "space-between",
         alignItems: "center",
         background: "#012c6e",
-        padding: "30px",
+        padding: "50px",
         boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)"
       }}
     >
       {/* Logo yoki sayt nomi */}
-      <Link to={"/home"} style={{ width: "40px" }}>
+      <Link to={"/home"} style={{ width: "50px" }}>
         <img src={logo} alt='' />
       </Link>
 
-      {/* Navigation and User info */}
-      {/* User info va dropdown */}
+      {/* Desktop title (faqat md dan katta ekranlarda) */}
+      <p className='hidden font-bold md:block text-white text-xl text-center font-medium max-w-[800px]'>
+        Kredit-modul tizimida fizika fanidan mustaqil ta`limni tashkil etish
+        metodikasini takomillashtirish-web ilovasi
+      </p>
+
+      {/* Mobile title (faqat kichik ekranlarda) */}
+      <p className='block md:hidden text-white text-base text-center font-medium'>
+        Fizika mustaqil ta'lim
+      </p>
+
       <Dropdown overlay={menu} trigger={["click"]}>
-        <Space style={{ cursor: "pointer" }}>
-          <Avatar
-            style={{ backgroundColor: "#87d068" }}
-            icon={<UserOutlined />}
-          />
-          <Text style={{ color: "white" }}>
-            {user.firstname} {user.lastname}
-          </Text>
-          <DownOutlined style={{ color: "white" }} />
+        <Space className='cursor-pointer select-none'>
+          <Avatar className='bg-green-400' icon={<UserOutlined />} />
+
+          <div className='text-white font-medium'>
+            <span>{user.firstname}</span>
+
+            <span className='hidden md:inline ml-1'>{user.lastname}</span>
+          </div>
+
+          <DownOutlined className='text-white hidden md:inline' />
         </Space>
       </Dropdown>
     </Header>

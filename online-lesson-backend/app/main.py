@@ -42,9 +42,9 @@ def seed_sections():
     print(admin.firstname)
     if not admin:
         new_admin = models.User(
-            username="ravshan",
-            firstname="Ravshan",
-            lastname="Kamoliddinov",
+            username="admin",
+            firstname="admin",
+            lastname="admin",
             role="admin",
             password="admin123"
         )
