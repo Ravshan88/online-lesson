@@ -8,7 +8,7 @@ from .config import settings
 # import time
 
 SQLALCHEMY_DATABASE_URL = settings.DATABASE_URL
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
+engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"sslmode": "require"})
 SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 Base = declarative_base()
 
