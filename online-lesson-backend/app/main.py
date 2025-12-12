@@ -39,7 +39,6 @@ def seed_sections():
 
     db = SessionLocal()
     admin = db.query(models.User).filter(models.User.role == 'admin').first()
-    print(admin.firstname)
     if not admin:
         new_admin = models.User(
             username="admin",
