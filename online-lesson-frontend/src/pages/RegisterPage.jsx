@@ -17,6 +17,8 @@ const RegisterPage = () => {
       navigate("/login");
     },
     onError: (error) => {
+      console.log(error);
+
       notification.error({
         message: "Xatolik!",
         description:
@@ -54,6 +56,29 @@ const RegisterPage = () => {
                 name='lastname'
                 rules={[
                   { required: true, message: "Itimos familiyangizni kiriting!" }
+                ]}
+              >
+                <Input />
+              </Form.Item>
+            </Col>
+            <Col xs={24}>
+              <Form.Item
+                label='Fakultet'
+                name='faculty'
+                rules={[
+                  { required: true, message: "Itimos fakultetni kiriting!" }
+                ]}
+              >
+                <Input />
+              </Form.Item>
+            </Col>
+
+            <Col xs={24}>
+              <Form.Item
+                label='Yo‘nalish'
+                name='direction'
+                rules={[
+                  { required: true, message: "Itimos yo‘nalishni kiriting!" }
                 ]}
               >
                 <Input />

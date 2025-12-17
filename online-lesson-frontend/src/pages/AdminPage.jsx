@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { Layout, Breadcrumb, Button } from "antd";
 import { HomeOutlined, ArrowLeftOutlined } from "@ant-design/icons";
-import { useNavigate } from "react-router-dom";
 import AdminSidebar from "../components/AdminSidebar";
 import MaterialsTable from "../components/MaterialsTable";
 import AppHeader from "../components/AppHeader";
 
 const { Sider, Content } = Layout;
 
-export default function AdminPage() {
-  const navigate = useNavigate();
+export default function AdminPage() {  
   const [selectedSection, setSelectedSection] = useState(() => {
     // Load from localStorage on mount
     const saved = localStorage.getItem("admin_selected_section");

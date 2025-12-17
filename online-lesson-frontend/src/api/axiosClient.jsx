@@ -1,12 +1,14 @@
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 
+const baseURL = "http://localhost:8000";
+// const baseURL = import.meta.env.VITE_API_URL;
 const axiosClient = axios.create({
-  baseURL: "http://localhost:8000", // 🔑 Backend API
+  baseURL,
   timeout: 6000,
-  headers: {
-    "Content-Type": "application/json"
-  }
+  // headers: {
+  //   "Content-Type": "application/json"
+  // }
 });
 
 // Request interceptor - add token to requests

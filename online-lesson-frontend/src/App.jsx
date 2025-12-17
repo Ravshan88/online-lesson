@@ -35,7 +35,7 @@ function App() {
           }
         />
         <Route
-          path='/admin/material/:id/tests'
+          path='/admin/:title/:id/tests'
           element={
             <AdminProtectedRoute>
               <MaterialTestsPage />

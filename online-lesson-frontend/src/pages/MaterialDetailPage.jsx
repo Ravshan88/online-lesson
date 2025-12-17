@@ -122,9 +122,11 @@ export default function MaterialDetailPage() {
   const fileAttachments = getAllFileAttachments(attachments);
 
   const handleDownloadFile = (attachmentId) => {
+    const url = "http://localhost:8000"
+    // const url = import.meta.env.VITE_API_URL
     // Use the get_file endpoint for any file type
     window.open(
-      `http://localhost:8000/materials/get_file/${attachmentId}`,
+      `${url}/materials/get_file/${attachmentId}`,
       "_blank"
     );
   };

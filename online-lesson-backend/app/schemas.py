@@ -10,6 +10,8 @@ class UserCreate(BaseModel):
     lastname: str
     username: str
     password: str
+    faculty: str
+    direction: str
 
 
 class UserOut(BaseModel):
@@ -17,6 +19,8 @@ class UserOut(BaseModel):
     username: str
     firstname: str
     lastname: str
+    faculty: str
+    direction: str
     role: str
 
     class Config:

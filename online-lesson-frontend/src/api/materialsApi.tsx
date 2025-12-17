@@ -13,7 +13,7 @@ export const getMaterialById = async (id: any) => {
 
 // create material with form-data (files)
 export const createMaterial = async (formData) => {
-  const res = await axiosClient.post("/materials/", formData, {
+  const res = await axiosClient.post("/materials", formData, {
     headers: { "Content-Type": "multipart/form-data" }
   });
   return res.data;

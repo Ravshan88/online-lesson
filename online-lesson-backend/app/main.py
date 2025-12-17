@@ -2,7 +2,15 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from . import models
 from .database import engine, get_db
-from .routers import user, auth, sections, materials, test, progress_router, test_sessions
+from .routers import (
+    user,
+    auth,
+    sections,
+    materials,
+    test,
+    progress_router,
+    test_sessions,
+)
 
 models.Base.metadata.create_all(bind=engine)
 app = FastAPI()
@@ -20,6 +28,7 @@ app.add_middleware(
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["Content-Disposition"],
 )
 
 app.include_router(user.router)
@@ -38,14 +47,14 @@ def seed_sections():
     from .database import SessionLocal
 
     db = SessionLocal()
-    admin = db.query(models.User).filter(models.User.role == 'admin').first()
+    admin = db.query(models.User).filter(models.User.role == "admin").first()
     if not admin:
         new_admin = models.User(
             username="admin",
             firstname="admin",
             lastname="admin",
             role="admin",
-            password="admin123"
+            password="admin123",
         )
         db.add(new_admin)
         db.commit()
@@ -57,14 +66,16 @@ def seed_sections():
                 {"name": "Amaliy"},
                 {"name": "Tajriba"},
                 {"name": "Mustaqil Ish"},
-                {"name": "Yakuniy Test"}
+                {"name": "Yakuniy Test"},
             ]
             for data in defaults:
                 db.add(Section(**data))
             db.commit()
         else:
             # Check if "Yakuniy Test" exists, if not add it
-            yakuniy_test = db.query(Section).filter(Section.name == "Yakuniy Test").first()
+            yakuniy_test = (
+                db.query(Section).filter(Section.name == "Yakuniy Test").first()
+            )
             if not yakuniy_test:
                 db.add(Section(name="Yakuniy Test"))
                 db.commit()

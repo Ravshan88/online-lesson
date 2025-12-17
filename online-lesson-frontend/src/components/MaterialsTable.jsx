@@ -12,7 +12,12 @@ import {
   Tag,
   message
 } from "antd";
-import { UploadOutlined, PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import {
+  UploadOutlined,
+  PlusOutlined,
+  EditOutlined,
+  DeleteOutlined
+} from "@ant-design/icons";
 import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
 import {
   getMaterialsBySection,
@@ -144,7 +149,7 @@ export default function MaterialsTable({ sectionId }) {
   const onFinish = (values) => {
     // build FormData
     const formData = new FormData();
-    formData.append("section_id", sectionId);
+    formData.append("section_id", Number(sectionId));
 
     if (values.title) formData.append("title", values.title);
 
@@ -219,7 +224,7 @@ export default function MaterialsTable({ sectionId }) {
         <div style={{ display: "flex", gap: 8 }}>
           <Button
             type='default'
-            onClick={() => navigate(`/admin/material/${record.id}/tests`)}
+            onClick={() => navigate(`/admin/${record.title}/${record.id}/tests`)}
           >
             🧠 Testlar
           </Button>
@@ -232,13 +237,15 @@ export default function MaterialsTable({ sectionId }) {
       width: 180,
       render: (_, record) => (
         <Space>
-          <Button onClick={() => openEditModal(record)}><EditOutlined/></Button>
+          <Button onClick={() => openEditModal(record)}>
+            <EditOutlined />
+          </Button>
           <Popconfirm
             title='Oʻchirishni tasdiqlaysizmi?'
             onConfirm={() => handleDelete(record.id)}
           >
             <Button danger loading={deleteMut.isLoading}>
-              <DeleteOutlined/>
+              <DeleteOutlined />
             </Button>
           </Popconfirm>
         </Space>

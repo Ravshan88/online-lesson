@@ -23,6 +23,8 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     firstname = Column(String, nullable=False)
     lastname = Column(String, nullable=False)
+    faculty = Column(String, nullable=False)
+    direction = Column(String, nullable=False)
     username = Column(String, nullable=False, unique=True)
     password = Column(String, nullable=False)
     role = Column(String, nullable=False)
@@ -88,7 +90,11 @@ class UserProgress(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"))
-    attachment_id = Column(UUID(as_uuid=True), ForeignKey("attachments.id", ondelete="CASCADE"), nullable=True)
+    attachment_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("attachments.id", ondelete="CASCADE"),
+        nullable=True,
+    )
     test_id = Column(Integer, ForeignKey("tests.id", ondelete="CASCADE"), nullable=True)
 
     is_completed = Column(Integer, default=0)  # 0 = bajarilmagan, 1 = bajarilgan

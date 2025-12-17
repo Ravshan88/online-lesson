@@ -11,11 +11,11 @@ import {
   Breadcrumb
 } from "antd";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
 import { HomeOutlined, ArrowLeftOutlined } from "@ant-design/icons";
+import axiosClient from "../api/axiosClient";
 
 export default function MaterialTestsPage() {
-  const { id } = useParams();
+  const { id, title } = useParams();
   const [tests, setTests] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingTest, setEditingTest] = useState(null);
@@ -24,7 +24,8 @@ export default function MaterialTestsPage() {
 
   const fetchTests = async () => {
     try {
-      const res = await axios.get(`http://localhost:8000/tests/material/${id}`);
+      // const res = await axios.get(`http://localhost:8000/tests/material/${id}`);
+      const res = await axiosClient.get(`/tests/material/${id}`)
       setTests(res.data);
     } catch (err) {
       console.error(err);
@@ -45,13 +46,13 @@ export default function MaterialTestsPage() {
       };
 
       if (editingTest) {
-        await axios.put(
-          `http://localhost:8000/tests/${editingTest.id}`,
+        await axiosClient.put(
+          `/tests/${editingTest.id}`,
           formatted
         );
         message.success("Test yangilandi!");
       } else {
-        await axios.post("http://localhost:8000/tests/", formatted);
+        await axiosClient.post("/tests/", formatted);
         message.success("Test qo‘shildi!");
       }
 
@@ -77,7 +78,7 @@ export default function MaterialTestsPage() {
 
   const handleDelete = async (testId) => {
     try {
-      await axios.delete(`http://localhost:8000/tests/${testId}`);
+      await axiosClient.delete(`/tests/${testId}`);
       message.success("Test o‘chirildi!");
       fetchTests();
     } catch (err) {
@@ -121,7 +122,7 @@ export default function MaterialTestsPage() {
 
   return (
     <div style={{ padding: 24 }}>
-      <h2>Material #{id} uchun testlar</h2>
+      <h2>{title} uchun testlar</h2>
       <Breadcrumb
         style={{ marginBottom: 16 }}
         items={[
@@ -136,7 +137,7 @@ export default function MaterialTestsPage() {
             title: <a href='/admin'>Admin panel</a>
           },
           {
-            title: `Material ${id}`
+            title: `${title}`
           }
         ]}
       />

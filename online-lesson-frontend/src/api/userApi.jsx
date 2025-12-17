@@ -3,7 +3,7 @@ import axiosClient from "./axiosClient";
 export const userApi = {
   // Ro‘yxatdan o‘tish
   register: async (data) => {
-    const res = await axiosClient.post("/user", data);
+    const res = await axiosClient.post("/user/", data);
     return res.data;
   },
 
